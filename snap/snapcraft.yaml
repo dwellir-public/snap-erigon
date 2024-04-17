@@ -39,7 +39,6 @@ description: |
   Check logs from the erigon service with 'snap logs erigon -f'
 
 parts:
-
   go-deps:
     plugin: nil
     build-packages:
@@ -58,7 +57,6 @@ parts:
       export GOPATH=$GO_PATH
       export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
       $GO_BINARY version
-
   erigon:
     after: [go-deps]
     plugin: go
@@ -92,18 +90,23 @@ parts:
       cd $SNAPCRAFT_PART_SRC
       go mod tidy
       make all
-      mkdir -p $SNAPCRAFT_PART_INSTALL/bin/
-      cp $SNAPCRAFT_PART_SRC/build/bin/* $SNAPCRAFT_PART_INSTALL/bin/
+      make DIST=$SNAPCRAFT_PART_INSTALL install
+      mkdir -p $SNAPCRAFT_PART_INSTALL/lib/
+      if [ ! -f $SNAPCRAFT_PART_INSTALL/lib/libsilkworm_capi.so ]; then
+        mv $SNAPCRAFT_PART_INSTALL/libsilkworm_capi.so $SNAPCRAFT_PART_INSTALL/lib/
+      fi
+    organize:
+      erigon: bin/erigon   
     prime:
+      - '*'
       - bin/*
-
+      - lib/*
   wrappers:
     plugin: dump
     source-type: local
     source: .
     stage:
       - wrappers/start-erigon.bash
-    
   utils:
     plugin: dump
     source-type: local
@@ -112,7 +115,6 @@ parts:
       - utils/endure-utils.sh
       - utils/service-args-utils.sh
       - utils/utils.sh
-
 apps:
   erigon:
     command: bin/erigon
@@ -125,6 +127,7 @@ apps:
       - network-bind
       - home
     environment:
+      LD_LIBRARY_PATH: $SNAP/lib:$SNAP/usr/lib:$LD_LIBRARY_PATH
       PATH: $SNAP/usr/sbin:$SNAP/usr/bin:$SNAP/sbin:$SNAP/bin:$PATH
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
