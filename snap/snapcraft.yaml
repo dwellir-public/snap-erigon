@@ -1,0 +1,133 @@
+name: erigon
+title: Erigon
+base: core22
+adopt-info: erigon
+summary: Erigon - Ethereum implementation, efficient and reliable.
+license: GPL-3.0-with-GCC-exception
+contact: info@dwellir.com
+issues: https://github.com/dwellir-public/snap-erigon/issues
+source-code: https://github.com/dwellir-public/snap-erigon
+website: https://www.dwellir.com
+grade: stable
+confinement: strict
+
+architectures:
+  - amd64
+
+description: |
+  Erigon is an implementation of Ethereum (execution layer with embeddable consensus layer), on the efficiency
+  frontier. Archive Node by default.
+
+  Disclaimer: this software is currently a tech preview. We will do our best to keep it stable and make no breaking
+  changes but we don't guarantee anything. Things can and will break.
+
+  Important defaults: Erigon is an Archive Node by default (to remove history see: --prune flags in erigon --help). 
+  We don't allow change this flag after first start.
+
+  System Requirements
+    - For an Archive node of Ethereum Mainnet we recommend >=3TB storage space: 1.8TB state (as of March 2022), 200GB temp
+      files (can symlink or mount folder <datadir>/temp to another disk). Ethereum Mainnet Full node ( see --prune* flags): 400Gb (April 2022).
+    - Goerli Full node (see --prune* flags): 189GB on Beta, 114GB on Alpha (April 2022).
+    - Gnosis Chain Archive: 370GB (January 2023).
+    - Polygon Mainnet Archive: 5TB. (April 2022). --prune.*.older 15768000: 5.1Tb (Sept 2023). Polygon Mumbai Archive: 1TB. (April 2022).
+    - SSD or NVMe. Do not recommend HDD - on HDD Erigon will always stay N blocks behind chain tip, but not fall behind. Bear in mind that SSD performance deteriorates when close to capacity.
+    - RAM: >= 16GB, 64-bit architecture.
+    - Golang version >= 1.19; GCC 10+ or Clang; On Linux: kernel > v4
+
+  Start the service with 'sudo snap start erigon'
+
+  Check logs from the erigon service with 'snap logs erigon -f'
+
+parts:
+  go-deps:
+    plugin: nil
+    build-packages:
+    - curl
+    - tar
+    - golang
+    override-pull: |
+      GO_VERSION="1.20"
+      GO_ROOT=/usr/local/go
+      GO_PATH=$HOME/go
+      GO_BINARY=$GO_ROOT/bin/go
+      rm -rf $GO_ROOT  
+      curl -L "https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz" -o /tmp/go${GO_VERSION}.linux-amd64.tar.gz
+      tar -C /usr/local -xzf /tmp/go${GO_VERSION}.linux-amd64.tar.gz
+      export GOROOT=$GO_ROOT
+      export GOPATH=$GO_PATH
+      export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+      $GO_BINARY version
+  erigon:
+    after: [go-deps]
+    plugin: go
+    source: https://github.com/ledgerwatch/erigon.git
+    source-tag: v2.59.3
+    build-packages:
+      - build-essential
+      - libssl-dev
+      - git
+      - clang
+      - libclang-dev
+      - pkg-config
+      - protobuf-compiler
+      - make
+    override-pull: |
+      export GOPATH=$HOME/go
+      export PATH=$PATH:$GOPATH/bin
+      export GO_VERSION="1.20"
+      export GOROOT=/usr/local/go
+      export GO_BINARY=$GOROOT/bin/go
+      go version
+      git clone https://github.com/ledgerwatch/erigon.git $SNAPCRAFT_PART_SRC
+      cd $SNAPCRAFT_PART_SRC
+      git checkout v2.59.3 
+      craftctl set version="$(git describe --tags --abbrev=10)-$(git rev-parse --short HEAD)"
+      $GO_BINARY mod tidy
+    override-build: |
+      export GOROOT=/usr/local/go
+      export GOPATH=$HOME/go
+      export PATH=$GOROOT/bin:$GOPATH/bin:$PATH
+      cd $SNAPCRAFT_PART_SRC
+      go mod tidy
+      make all
+      make DIST=$SNAPCRAFT_PART_INSTALL install
+      mkdir -p $SNAPCRAFT_PART_INSTALL/lib/
+      if [ ! -f $SNAPCRAFT_PART_INSTALL/lib/libsilkworm_capi.so ]; then
+        mv $SNAPCRAFT_PART_INSTALL/libsilkworm_capi.so $SNAPCRAFT_PART_INSTALL/lib/
+      fi
+    organize:
+      erigon: bin/erigon   
+    prime:
+      - '*'
+      - bin/*
+      - lib/*
+  wrappers:
+    plugin: dump
+    source-type: local
+    source: .
+    stage:
+      - wrappers/start-erigon.bash
+  utils:
+    plugin: dump
+    source-type: local
+    source: .
+    stage:
+      - utils/endure-utils.sh
+      - utils/service-args-utils.sh
+      - utils/utils.sh
+apps:
+  erigon:
+    command: bin/erigon
+    daemon: simple
+    install-mode: disable
+    refresh-mode: endure
+    restart-condition: never
+    plugs:
+      - network
+      - network-bind
+      - home
+    environment:
+      LD_LIBRARY_PATH: $SNAP/lib:$SNAP/usr/lib:$LD_LIBRARY_PATH
+      PATH: $SNAP/usr/sbin:$SNAP/usr/bin:$SNAP/sbin:$SNAP/bin:$PATH
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
