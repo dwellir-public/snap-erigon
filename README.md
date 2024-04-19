@@ -41,8 +41,8 @@ default=--base-path=$SNAP_COMMON/erigon_base --name=<hostname>
 
 For available arguments see [here](https://github.com/dwellir-public/ops/blob/75dee8928b875955e8bb28656307214a73367d76/juju/deployments/api-eth-mainnet-archive-18.yaml)
 The value set here will be passed to the Erigon binary 
-* --name defaults to the systems hostname the first time the snap is installed.
-* --base-path is always set by the snap to `$SNAP_COMMON/erigon_base` and is not allowed to be configured.
+* --http.api=eth,net,web3,debug specifies which JSON-RPC API groups to enable. JSON-RPC is a remote procedure call protocol encoded in JSON. It's used here to specify which groups of RPC methods should be available.
+* --txpool.pricelimit=0: This sets the transaction pool price limit to 0.
 
 Example:
 
