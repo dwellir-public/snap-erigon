@@ -43,6 +43,7 @@ For available arguments see [here](https://github.com/ledgerwatch/erigon/blob/de
 The value set here will be passed to the Erigon binary 
 * --http.api=eth,net,web3,debug specifies which JSON-RPC API groups to enable. JSON-RPC is a remote procedure call protocol encoded in JSON. It's used here to specify which groups of RPC methods should be available.
 * --txpool.pricelimit=0: This sets the transaction pool price limit to 0.
+* --base-path is always set by the snap to `$SNAP_COMMON/erigon_base` and is not allowed to be configured.
 
 Example:
 
