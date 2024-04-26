@@ -2,7 +2,7 @@
 
 . "$SNAP/utils/utils.sh"
 
-BASE_PATH="$SNAP_COMMON/polkadot_base"
+BASE_PATH="$SNAP_COMMON/dwellir_base"
 SERVICE_ARGS_FILE="$SNAP_COMMON/service-arguments"
 
 write_service_args_file()
