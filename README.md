@@ -47,7 +47,7 @@ The value set here will be passed to the Erigon binary
 
 Example:
 
-    sudo snap set erigon service-args="http.api=eth,net,web3,debug --txpool.pricelimit=0"
+    sudo snap set erigon service-args="--private.api.addr=127.0.0.1:9092"
 
 
 #### endure
