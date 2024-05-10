@@ -6,7 +6,7 @@ BASE_PATH="$SNAP_COMMON/erigon_base"
 SERVICE_ARGS_FILE="$SNAP_COMMON/service-arguments"
 
 write_service_args_file()
-{   
+{
     service_args="--datadir=$BASE_PATH $(get_service_args)"
     log "Writing \"$service_args\" to $SERVICE_ARGS_FILE"
     echo "$service_args" > "$SERVICE_ARGS_FILE"

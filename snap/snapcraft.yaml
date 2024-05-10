@@ -95,7 +95,6 @@ parts:
       if [ ! -f $SNAPCRAFT_PART_INSTALL/lib/libsilkworm_capi.so ]; then
         mv $SNAPCRAFT_PART_INSTALL/libsilkworm_capi.so $SNAPCRAFT_PART_INSTALL/lib/
       fi
-      # chmod +x /root/parts/wrappers/install/bin/start-erigon.bash
     organize:
       erigon: bin/erigon   
     prime:
