@@ -29,5 +29,15 @@ handle_endure_config()
     set_endure "$endure"
 }
 
+service_args_file()
+{
+    SERVICE_ARGS_FILE="$SNAP_COMMON/service-arguments"
+    if [ ! -f "$SERVICE_ARGS_FILE" ]; then
+        log "service-arguments file not found. Creating file..."
+        touch "$SERVICE_ARGS_FILE"
+    fi
+}
+
+service_args_file
 handle_service_args_config
 handle_endure_config

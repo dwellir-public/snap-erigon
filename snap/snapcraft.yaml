@@ -58,7 +58,7 @@ parts:
       export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
       $GO_BINARY version
   erigon:
-    after: [go-deps]
+    after: [go-deps,wrappers]
     plugin: go
     source: https://github.com/ledgerwatch/erigon.git
     source-tag: v2.59.3
@@ -100,24 +100,19 @@ parts:
     prime:
       - '*'
       - bin/*
-      - lib/*
   wrappers:
     plugin: dump
-    source-type: local
-    source: .
-    stage:
-      - wrappers/start-erigon.bash
+    source: wrappers/
+    organize:
+      'start-erigon.bash': bin/start-erigon.bash
   utils:
     plugin: dump
-    source-type: local
     source: .
     stage:
-      - utils/endure-utils.sh
-      - utils/service-args-utils.sh
-      - utils/utils.sh
+      - utils/
 apps:
   erigon:
-    command: bin/erigon
+    command: bin/start-erigon.bash
     daemon: simple
     install-mode: disable
     refresh-mode: endure
@@ -125,9 +120,6 @@ apps:
     plugs:
       - network
       - network-bind
-      - home
     environment:
-      LD_LIBRARY_PATH: $SNAP/lib:$SNAP/usr/lib:$LD_LIBRARY_PATH
-      PATH: $SNAP/usr/sbin:$SNAP/usr/bin:$SNAP/sbin:$SNAP/bin:$PATH
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
