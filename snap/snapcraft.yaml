@@ -81,7 +81,7 @@ parts:
       git clone https://github.com/ledgerwatch/erigon.git $SNAPCRAFT_PART_SRC
       cd $SNAPCRAFT_PART_SRC
       git checkout v2.59.3 
-      craftctl set version="$(git describe --tags --abbrev=10)-$(git rev-parse --short HEAD)"
+      craftctl set version="2.59.3-$(git rev-parse --short HEAD)"
       $GO_BINARY mod tidy
     override-build: |
       export GOROOT=/usr/local/go
@@ -100,19 +100,22 @@ parts:
     prime:
       - '*'
       - bin/*
+
   wrappers:
     plugin: dump
-    source: wrappers/
-    organize:
-      'start-erigon.bash': bin/start-erigon.bash
+    source-type: local
+    source: .
+    stage:
+      - wrappers/
+
   utils:
     plugin: dump
     source: .
     stage:
       - utils/
 apps:
-  erigon:
-    command: bin/start-erigon.bash
+  erigon-daemon:
+    command: wrappers/start-erigon.bash
     daemon: simple
     install-mode: disable
     refresh-mode: endure
