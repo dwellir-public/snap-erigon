@@ -20,7 +20,7 @@ The snap currently ships all binaries (this will probably change in the future):
 * debug  
 * devnet  
 * downloader  
-* erigon  
+* erigon         ->  /var/snap/current/bin/erigon
 * erigoncustom  
 * evm	
 * hack  
