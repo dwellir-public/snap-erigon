@@ -12,6 +12,34 @@ cd snap-erigon
 snapcraft pack --use-lxd --debug --verbosity=debug # Takes some time.
 ```
 
+The snap currently ships all binaries (this will probably change in the future): 
+* abigen 
+* bootnode 
+* capcli 
+* caplin 
+* debug  
+* devnet  
+* downloader  
+* erigon  
+* erigoncustom  
+* evm	
+* hack  
+* integration  
+* observer  
+* p2psim  
+* pics  
+* rlpdump  
+* rpcdaemon  
+* rpctest	
+* sentinel  
+* sentry  
+* silkworm_api	
+* snapshots  
+* state  
+* txpool  
+* verkle
+
+
 ## Releasing
 
 When a commit is made to the main branch a build will start in launchpad and if successful release to the edge channel.
