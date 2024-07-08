@@ -44,11 +44,10 @@ parts:
     build-snaps: [go/latest/stable]
     source: https://github.com/ledgerwatch/erigon.git
     source-tag: v2.59.3
+
     override-pull: |
       craftctl default
       craftctl set version="2.59.3-$(git rev-parse --short HEAD)"
-    organize:
-      erigon: bin/erigon
 
     override-build: |
       # The Makefile contains bunch of compiler options. Don't even try reproduce it.
@@ -56,12 +55,17 @@ parts:
       make all
       make DIST=$SNAPCRAFT_PART_INSTALL install
       mkdir -p $SNAPCRAFT_PART_INSTALL/lib/
+
+      # Rip out the libsilkworm_capi.so and ship it.
       find /root/go/pkg/mod/github.com/erigontech/ -name libsilkworm_capi.so -exec cp {} $SNAPCRAFT_PART_INSTALL/lib/ \;
 
-    # We only ship these binaries:
     stage:
-      - bin/*
+      - bin/erigon
       - lib/libsilkworm_capi.so
+
+    organize:
+      erigon: bin/erigon
+
 
   wrappers:
     plugin: dump
@@ -70,11 +74,14 @@ parts:
     stage:
       - wrappers/
 
+
   utils:
     plugin: dump
     source: .
     stage:
       - utils/
+
+
 apps:
   erigon-daemon:
     command: wrappers/start-erigon.bash
@@ -89,5 +96,6 @@ apps:
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
 
+# Make sure we can find libsilkworm_capi.so by setting LD_LIBRARY_PATH
 environment:
   LD_LIBRARY_PATH: "$SNAP/lib:$LD_LIBRARY_PATH"
