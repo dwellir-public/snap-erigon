@@ -43,11 +43,11 @@ parts:
     plugin: go
     build-snaps: [go/latest/stable]
     source: https://github.com/ledgerwatch/erigon.git
-    source-tag: v3.0.1
+    source-tag: v3.0.3
 
     override-pull: |
       craftctl default
-      craftctl set version="v3.0.1-$(git rev-parse --short HEAD)"
+      craftctl set version="v3.0.3-$(git rev-parse --short HEAD)"
 
     override-build: |
       # The Makefile contains bunch of compiler options. Don't even try reproduce it.
